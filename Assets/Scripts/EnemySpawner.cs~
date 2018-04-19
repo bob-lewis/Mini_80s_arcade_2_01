@@ -1,0 +1,86 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class EnemySpawner : MonoBehaviour {
+	public GameObject enemyPrefab1;
+	public GameObject enemyPrefab2;
+	public GameObject enemyPrefab3;
+	public GameObject ufoPrefab;
+
+	public float width = 10f;
+	public float height = 3f;
+	public bool movingRight = true;
+	static public float enemyCount;
+	public float speed = 30f;
+	public GameObject CRT ;
+	public float x_min;
+	public float x_max ;
+	public float y_max;
+	public float buffer=1;
+	public float half_screen;
+	public float adaptingSpeed;
+
+
+
+
+
+	// Use this for initialization
+	void Start () {
+		//half_screen =CRT.GetComponent<BoxCollider2D>().size.x  /2;
+		GameObject enemyPrefab;
+
+		 half_screen =6.485f;
+		x_max=CRT.transform.position.x + half_screen;
+		x_min=CRT.transform.position.x - half_screen;
+
+
+
+
+		foreach( Transform child in transform){//for every transform in the Enemyformation
+			print (child.tag);
+			if (child.tag =="enemy2"){ enemyPrefab=enemyPrefab2;}
+			else if (child.tag =="enemy3"){ enemyPrefab=enemyPrefab3;}
+			else{enemyPrefab=enemyPrefab1;}
+			GameObject enemy = Instantiate(enemyPrefab, child.transform.position,Quaternion.identity) as GameObject;
+			enemy.transform.parent = child;
+			enemyCount ++;
+		}
+
+	}
+	public void OnDrawGizmos(){ 
+		float y_moved = this.transform.position.y-.2f;
+		float x_moved = this.transform.position.x;
+		Vector2 temp= new Vector2  (x_moved,y_moved);
+
+		
+		Gizmos.DrawWireCube(temp,new Vector3(width,height));
+	}
+	
+	// Update is called once per frame
+	void Update () {
+
+
+		float rightEdgeofFormation=transform.position.x+(width/2);
+		float leftEdgeofFormation=transform.position.x-(width/2);
+
+		if (leftEdgeofFormation<= x_min ){
+				
+			transform.position +=  Vector3.down * 1f * Time.deltaTime;
+				movingRight =true;
+			}
+		else if(rightEdgeofFormation >= x_max){
+			transform.position +=  Vector3.down * 1f * Time.deltaTime;
+			movingRight=false;}
+
+
+		 adaptingSpeed = speed/enemyCount;
+		if (movingRight){
+				transform.position +=  Vector3.right* adaptingSpeed*Time.deltaTime;}
+		else{
+			transform.position +=  Vector3.left* adaptingSpeed*Time.deltaTime;}
+
+	
+	}
+}
+
+

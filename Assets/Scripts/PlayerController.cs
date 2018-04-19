@@ -1,0 +1,107 @@
+﻿ using UnityEngine;
+using System.Collections;
+
+public class PlayerController : MonoBehaviour {
+	
+	public float speed;
+	public Vector3 shipPos;
+	public float padding= 0.01f;
+	//public Sprite ship;
+	//public Sprite shipl;
+	//public Sprite shipr;
+	private string state;
+	public Button_press_fire fire;
+	public Button_press_left left;
+	public Button_press_right right;
+	public float x_min ;
+	public float x_max ;
+	public GameObject projectile;
+	public float projectileSpeed=3;
+	public GameObject[] gos;
+	//public bool Main.lookleft=Main.Main.lookleft;
+	//public bool Main.lookright=Main.lookright;
+	public float laser_start=.5f;
+
+	//dd in refernce to 3 buttons and change on moveGameObject.FindWithTag("ui")
+	
+	
+
+
+	// Use this for initialization
+	void Start () {//having a brianfart and canot get this working more elegently - so 3 scripts for buttons to push up ,
+	//	 down and fire, will change to allin1 later
+		fire = GameObject.FindObjectOfType<Button_press_fire>();
+		left = GameObject.FindObjectOfType<Button_press_left>();
+		right = GameObject.FindObjectOfType<Button_press_right>();
+
+		
+		
+		//float distance = transform.position.z - Camera.main.transform.position.z;
+		//Vector3 leftmost = Camera.main.ViewportToWorldPoint(new Vector3(0,0,distance));
+		//uses boundries of playspace
+		//Vector3 rightmost = Camera.main.ViewportToWorldPoint(new Vector3(1,0,distance));
+		speed= 5f; 
+
+		//changed to fixed values as VR camera was causing problems
+		//x_min = leftmost.x +  padding;
+		//x_max = rightmost.x - padding;
+		Vector3 shipPos = new Vector3 ( this.transform.position.x, this.transform.position.y, 0f);
+		this.transform.position=shipPos;
+	}
+
+
+	
+
+
+			
+	void playerMove () {
+		if (Input.GetButtonDown("Fire1") && (gos.Length < 1)){fire.checker=true;
+			Fire();}
+	
+		if (Input.GetKey(KeyCode.LeftArrow) || Main.lookleft==true){left.checker=true;
+		transform.position+=  Vector3.left * speed * Time.deltaTime;
+		//gameObject.GetComponent<SpriteRenderer> ().sprite = shipl;
+			}	else if (Input.GetKey(KeyCode.RightArrow) || Main.lookright==true){right.checker=true;
+		transform.position+=  Vector3.right * speed * Time.deltaTime;
+		//gameObject.GetComponent<SpriteRenderer> ().sprite = shipr;
+		}
+		//	else{gameObject.GetComponent<SpriteRenderer> ().sprite = ship;}
+
+			if (Input.GetKeyUp(KeyCode.LeftArrow) || Main.lookleft==false){left.checker= false;
+		}	else if (Input.GetKeyUp(KeyCode.RightArrow) || Main.lookright==false){right.checker=false;
+
+		}	 if (Input.GetButtonUp("Fire1")){fire.checker=false;}
+
+		float newX = Mathf.Clamp(transform.position.x ,x_min,x_max);
+		transform.position = new Vector3(newX,transform.position.y,transform.position.z);
+		}
+
+
+	void Fire(){ Vector3 newPosition = new Vector3(transform.position.x,transform.position.y +laser_start,transform.position.z);
+		GameObject beam =Instantiate(projectile,(newPosition),Quaternion.identity) as GameObject;
+		beam.GetComponent<Rigidbody2D>().velocity= new Vector3 (0,projectileSpeed,0);
+
+
+	}
+	void OnCollisionEnter2D(Collision2D col){
+	if (Main.hi_score>=Main.savedHiScore)
+		PlayerPrefs.SetInt ("HighScore", Main.hi_score);
+	Main.score=0;
+	Main.reset=true;
+
+		}
+
+	
+	void Update () {
+		gos=GameObject.FindGameObjectsWithTag("player_fire");
+		playerMove();
+		
+
+		}
+	
+	
+
+	
+	}
+	
+
